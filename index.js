@@ -28,24 +28,7 @@ console.log(error)
   }
 };
 ConnectDb();
-let products = [
-  {
-    id: 1,
-    name: "Beautiful HEADPHONES",
-    price: 4500,
-    imageUrl:
-      "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8aGVhZHBob25lc3xlbnwwfHwwfHx8MA%3D%3D",
-    desc: "BLACK HEADSET WITH FREQUENCY.",
-  },
-  {
-    id: 2,
-    name: "A beautiful HEADSET with white and black combo",
-    price: 9300,
-    imageUrl:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT7DMu-7O2189abNd7fPJCirKtnE_NiO93s_g&s",
-    desc: "A beautiful cord set with white and black combo comfortable in wearing and affordable sset casual for office use.",
-  },
-];
+
 
 app.get("/products",  async(req, res) => {
 
@@ -80,30 +63,39 @@ app.post("/products", async(req, res) => {
 
 });
 
-app.put("/products/:id", (req, res) => {
+app.put("/products/:id", async(req, res) => {
   const { id } = req.params;
   const updatedProduct = req.body;
-  console.log(id);
-  console.log(updatedProduct);
-  const index = products.findIndex((product) => product.id === parseInt(id));
-  if (index !== -1) {
-    products[index] = { ...products[index], ...updatedProduct };
-    res.json(products[index]);
-  } else {
-    res.status(404).json({ message: "Product not found" });
-  }
+   try {
+    
+    await Product.findOneAndUpdate({id:id},{...updatedProduct});
+    res.json("succesfully updated")
+   } catch (error) {
+    
+    res.status(500).json("something went wrong")
+   }
+
 });
 
 
-
-
-app.delete("/products/:id", (req, res) => {
+app.delete("/products/:id",  async (req, res) => {
   const { id } = req.params;
-  products = products.filter((product) => product.id !== parseInt(id));
-  res.status(204).send();
+  try {
+     const deleteProduct=await Product.findOneAndDelete({id:id});
+     if(deleteProduct){
+      return res.status(200).json("succesfully delted");
+     }
+     else{
+      return  res.status(400).json("product not found");
+     }
+  } catch (error) {
+     res.status(500).json("something went wrong");
+  }
+ 
+ 
 });
-
 
 app.listen(5050, () => {
   console.log("Server is running on PORT 5050");
 });
+
