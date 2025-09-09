@@ -7,7 +7,7 @@ import Product from "./models/product.js";
 dotenv.config();
 const app = express();
 
-// ✅ Proper CORS Config
+// ✅ Proper CORS setup for frontend
 app.use(cors({
   origin: ["https://e-comerice-frontend.vercel.app"],
   methods: ["GET", "POST", "PUT", "DELETE"],
@@ -20,7 +20,7 @@ app.use(express.json());
 const connectDB = async () => {
   try {
     await mongoose.connect(process.env.MONGO_URI);
-    console.log("✅ MongoDB Connected Successfully!");
+    console.log("✅ MongoDB Connected!");
   } catch (error) {
     console.log("❌ MongoDB Connection Failed:", error.message);
     process.exit(1);
@@ -28,18 +28,18 @@ const connectDB = async () => {
 };
 connectDB();
 
-// ✅ GET Products API
+// ✅ GET Products
 app.get("/products", async (req, res) => {
   try {
-    const productsFromDB = await Product.find();
-    res.status(200).json(productsFromDB);
+    const products = await Product.find();
+    res.status(200).json(products);
   } catch (err) {
-    console.log("❌ GET /products Error:", err);
-    res.status(500).json({ message: "Something went wrong" });
+    console.error("❌ GET /products Error:", err);
+    res.status(500).json({ message: "Something went wrong on server" });
   }
 });
 
-// ✅ POST Product API
+// ✅ POST Product
 app.post("/products", async (req, res) => {
   try {
     const { id, name, price, imageUrl, desc } = req.body;
@@ -49,24 +49,24 @@ app.post("/products", async (req, res) => {
 
     res.status(201).json({ message: "Product Added Successfully!" });
   } catch (err) {
-    console.log("❌ POST /products Error:", err);
+    console.error("❌ POST /products Error:", err);
     res.status(500).json({ message: "Something went wrong" });
   }
 });
 
-// ✅ UPDATE Product API
+// ✅ PUT Product
 app.put("/products/:id", async (req, res) => {
   try {
     const { id } = req.params;
     await Product.findOneAndUpdate({ id }, req.body);
     res.status(200).json({ message: "Product Updated Successfully!" });
   } catch (err) {
-    console.log("❌ PUT /products Error:", err);
+    console.error("❌ PUT /products Error:", err);
     res.status(500).json({ message: "Something went wrong" });
   }
 });
 
-// ✅ DELETE Product API
+// ✅ DELETE Product
 app.delete("/products/:id", async (req, res) => {
   try {
     const { id } = req.params;
@@ -77,12 +77,12 @@ app.delete("/products/:id", async (req, res) => {
     }
     res.status(200).json({ message: "Product Deleted Successfully!" });
   } catch (err) {
-    console.log("❌ DELETE /products Error:", err);
+    console.error("❌ DELETE /products Error:", err);
     res.status(500).json({ message: "Something went wrong" });
   }
 });
 
-// ✅ Use Railway PORT
+// ✅ Use Railway PORT instead of fixed 5050
 const PORT = process.env.PORT || 5050;
 app.listen(PORT, () => {
   console.log(`🚀 Server running on PORT ${PORT}`);
